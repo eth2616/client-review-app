@@ -1,0 +1,27 @@
+[
+    {
+      "name": "MUFG Union Bank",
+      "industry": "Global Banking",
+      "hq_location": "San Francisco, CA",
+      "annual_revenue": 100,
+      "employee_count": 10000,
+      "risk_score": 0.75
+    },
+    {
+      "name": "Citi",
+      "industry": "Retail Banking",
+      "hq_location": "New York, NY",
+      "annual_revenue": 200,
+      "employee_count": 120000,
+      "risk_score": 0.9
+    },
+    {
+      "name": "Ally",
+      "industry": "Digital Banking",
+      "hq_location": "Detroit, MI",
+      "annual_revenue": 8,
+      "employee_count": 8800,
+      "risk_score": 0.45
+    }
+  ]
+  
