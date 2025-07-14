@@ -99,3 +99,6 @@ def save_client_to_csv(client_data: dict, classification: dict):
         print(f"✅ Appended client to {CSV_FILE}")
     except Exception as e:
         print(f"❌ Failed to write to {CSV_FILE}: {e}")
+
+
+print(f"📁 Writing CSV to: {os.path.abspath(CSV_FILE)}")
