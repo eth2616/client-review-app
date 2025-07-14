@@ -2,12 +2,14 @@
 import streamlit as st
 from utils.config import get_openai_api_key  # ← NEW: Centralized config
 from utils.file_io import save_client_to_csv, read_clients_from_csv
+from dotenv import load_dotenv
+load_dotenv()
+
 
 # --- Internal Imports ---
 try:
     from clients.classify import classify_client
-    from ai.openai_summary import summarize_client
-    st.write("✅ Modules loaded successfully")
+    from clients.summarize import summarize_client
 except Exception as e:
     st.error(f"❌ Failed to import core modules: {e}")
 

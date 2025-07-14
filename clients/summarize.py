@@ -1,10 +1,14 @@
 import json
 
-def summarize_client(client_dict):
+def summarize_client(client_dict, classification=None):
     try:
-        return f"{client_dict['name']} is a {client_dict['industry']} firm based in {client_dict['hq_location']}."
+        summary = f"{client_dict['name']} is a {client_dict['industry']} firm based in {client_dict['hq_location']}."
+        if classification:
+            summary += f" They are considered a {classification['risk_tier']} client in the {classification['revenue_tier']} segment."
+        return summary
     except KeyError as e:
         return f"Missing expected field: {e}"
+
 
 def get_client_json(client_dict):
     try:
