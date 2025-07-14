@@ -1,20 +1,21 @@
 from openai import OpenAI
-from dotenv import load_dotenv
-import os
+from utils.config import get_openai_api_key  # Centralized config
 
-# Load environment variables (e.g., your OpenAI API key)
-load_dotenv()
-openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+api_key = get_openai_api_key()
+openai_client = OpenAI(api_key=api_key)
 
-def generate_ai_summary(client_data, risk_tier):
+def generate_ai_summary(client_data, classification):
     prompt_lines = [
-        "You are a banking risk analyst. Summarize this high-risk client for an internal review memo:\n",
-        f"Name: {client_data['name']}",
-        f"Industry: {client_data['industry']}",
-        f"HQ Location: {client_data['hq_location']}",
-        f"Annual Revenue: {client_data['annual_revenue']} billion",
-        f"Employee Count: {client_data['employee_count']}",
-        f"Risk Score: {client_data['risk_score']}"
+        "You are a banking risk analyst. Summarize this client for an internal review memo:\n",
+        f"Name: {client_data.get('name')}",
+        f"Industry: {client_data.get('industry')}",
+        f"HQ Location: {client_data.get('hq_location')}",
+        f"Annual Revenue: {client_data.get('annual_revenue')} billion",
+        f"Employee Count: {client_data.get('employee_count')}",
+        f"Risk Score: {client_data.get('risk_score')}",
+        f"Risk Tier: {classification.get('risk_tier')}",
+        f"Revenue Tier: {classification.get('revenue_tier')}",
+        f"Review Required: {'Yes' if classification.get('review_required') else 'No'}"
     ]
 
     if client_data.get("watchlist") is not None:
@@ -35,5 +36,5 @@ def generate_ai_summary(client_data, risk_tier):
     except Exception as e:
         return f"❌ Error generating summary: {e}"
 
-# Alias for compatibility with other parts of the project
+# Alias for compatibility
 summarize_client = generate_ai_summary

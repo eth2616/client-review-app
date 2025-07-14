@@ -1,22 +1,53 @@
-def classify_client(client):
-    risk_score = client.get("risk_score", 0)
-    revenue = client.get("annual_revenue", 0)
+# --- Classify client data based on business rules ---
 
-    risk_tier = (
-        "High Risk" if risk_score > 0.8 else
-        "Moderate Risk" if risk_score > 0.5 else
-        "Low Risk"
+def classify_client(client_data):
+    """
+    Classifies a client into risk and revenue tiers and determines if further review is required.
+    
+    Parameters:
+        client_data (dict): Dictionary containing client attributes like revenue, risk score, etc.
+    
+    Returns:
+        dict: Classification result including risk_tier, revenue_tier, and review_required.
+    """
+
+    # --- Risk Tier Classification ---
+    # Based on risk score thresholds
+    risk_score = client_data.get("risk_score", 0)
+    if risk_score >= 0.7:
+        risk_tier = "High Risk"
+    elif risk_score >= 0.4:
+        risk_tier = "Moderate Risk"
+    else:
+        risk_tier = "Low Risk"
+
+    # --- Revenue Tier Classification ---
+    # Based on annual revenue in billions
+    revenue = client_data.get("annual_revenue", 0)
+    if revenue >= 10:
+        revenue_tier = "Enterprise"
+    elif revenue >= 1:
+        revenue_tier = "Mid-Market"
+    else:
+        revenue_tier = "Small Business"
+
+    # --- Review Requirement ---
+    # A review is required if:
+    # - The client is high risk
+    # - The client is on the watchlist
+    # - The client has documented regulatory issues
+    watchlist = client_data.get("watchlist", False)
+    has_issues = bool(client_data.get("regulatory_issues", "").strip())
+
+    review_required = (
+        risk_tier == "High Risk" or
+        watchlist or
+        has_issues
     )
 
-    revenue_tier = (
-        "Enterprise" if revenue > 50 else
-        "Mid-Market" if revenue > 10 else
-        "Small Business"
-    )
-
+    # --- Final Classification Dictionary ---
     return {
-        "name": client["name"],
         "risk_tier": risk_tier,
         "revenue_tier": revenue_tier,
-        "review_required": risk_tier == "High Risk"
+        "review_required": review_required
     }
