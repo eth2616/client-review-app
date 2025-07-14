@@ -67,6 +67,9 @@ def read_clients_from_csv(file_path):
         return pd.DataFrame()
 
 def save_client_to_csv(client_data: dict, classification: dict):
+    
+    print("🔧 save_client_to_csv() called")
+
     """
     Appends client input and classification result to a CSV file.
     This helps persist a record of all submissions and classifications.
