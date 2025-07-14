@@ -11,7 +11,11 @@ load_dotenv()  # Load .env file if it exists (for local dev)
 
 # --- Retrieve API Key ---
 # Priority: .env (local) > Streamlit Secrets (cloud)
-api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+try:
+    api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+except Exception:
+    api_key = os.getenv("OPENAI_API_KEY")
+
 if not api_key:
     st.error("❌ OPENAI_API_KEY not found in environment or Streamlit secrets.")
 
@@ -79,7 +83,8 @@ if submitted:
 st.subheader("📊 All Clients Logged")
 all_clients = read_clients_from_csv("classified_clients.csv")
 
-if all_clients:
+# Safely check if it's a non-empty DataFrame
+if hasattr(all_clients, "empty") and not all_clients.empty:
     st.dataframe(all_clients)
 else:
     st.info("No client data found yet.")
