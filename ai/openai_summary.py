@@ -5,17 +5,21 @@ api_key = get_openai_api_key()
 openai_client = OpenAI(api_key=api_key)
 
 def generate_ai_summary(client_data, classification):
+    """
+    Generates an AI-written summary of a client's risk profile.
+    Now dynamically reflects the correct risk tier.
+    """
     prompt_lines = [
-        "You are a banking risk analyst. Summarize this client for an internal review memo:\n",
-        f"Name: {client_data.get('name')}",
-        f"Industry: {client_data.get('industry')}",
-        f"HQ Location: {client_data.get('hq_location')}",
-        f"Annual Revenue: {client_data.get('annual_revenue')} billion",
-        f"Employee Count: {client_data.get('employee_count')}",
-        f"Risk Score: {client_data.get('risk_score')}",
-        f"Risk Tier: {classification.get('risk_tier')}",
-        f"Revenue Tier: {classification.get('revenue_tier')}",
-        f"Review Required: {'Yes' if classification.get('review_required') else 'No'}"
+        "You are a banking risk analyst. Write an internal memo summarizing the following client:\n",
+        f"Name: {client_data['name']}",
+        f"Industry: {client_data['industry']}",
+        f"HQ Location: {client_data['hq_location']}",
+        f"Annual Revenue: {client_data['annual_revenue']} billion",
+        f"Employee Count: {client_data['employee_count']}",
+        f"Risk Score: {client_data['risk_score']}",
+        f"Risk Tier: {classification['risk_tier']}",  # <- dynamically added
+        f"Revenue Tier: {classification['revenue_tier']}",
+        f"Review Required: {'Yes' if classification['review_required'] else 'No'}",
     ]
 
     if client_data.get("watchlist") is not None:
@@ -35,6 +39,7 @@ def generate_ai_summary(client_data, classification):
         return content.strip() if content else "❌ No response content received."
     except Exception as e:
         return f"❌ Error generating summary: {e}"
+
 
 # Alias for compatibility
 summarize_client = generate_ai_summary

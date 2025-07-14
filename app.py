@@ -52,7 +52,7 @@ if submitted:
         save_client_to_csv(client_data, classification)
 
     with st.spinner("Generating summary..."):
-        summary = summarize_client(client_data, classification)
+        summary = summarize_client(client_data, classification)  # pass classification
 
     st.subheader("🧠 Classification")
     st.json(classification)
