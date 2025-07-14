@@ -36,8 +36,9 @@ with st.form("client_form"):
 
     submitted = st.form_submit_button("Classify & Summarize")
 
-# --- On Submit ---
+# --- If Submitted: Classify, Summarize, Save ---
 if submitted:
+    # Collect form input into a dictionary
     client_data = {
         "name": name,
         "industry": industry,
@@ -49,24 +50,31 @@ if submitted:
         "regulatory_issues": regulatory_issues,
     }
 
+    # --- AI Classification ---
     with st.spinner("Classifying client..."):
         classification = classify_client(client_data)
         save_client_to_csv(client_data, classification)
+        st.toast("✅ Client classified and saved", icon="✅")
 
+    # --- AI Summary Generation ---
     with st.spinner("Generating summary..."):
-        summary = summarize_client(client_data, classification)  # pass classification
+        summary = summarize_client(client_data, classification)
+        st.toast("🧠 AI summary generated", icon="🧠")
 
+    # --- Display Results ---
     st.subheader("🧠 Classification")
     st.json(classification)
 
     st.subheader("📝 AI Summary")
     st.text_area("Summary Output", summary, height=300)
 
-# --- Display CSV Log ---
+# --- Show CSV Log of All Clients ---
 st.subheader("📊 All Clients Logged")
 all_clients = read_clients_from_csv("classified_clients.csv")
 
+# Safely check if it's a non-empty DataFrame
 if hasattr(all_clients, "empty") and not all_clients.empty:
     st.dataframe(all_clients)
+    st.toast("📊 Displaying all logged clients", icon="📊")
 else:
     st.info("No client data found yet.")
