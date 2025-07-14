@@ -6,7 +6,7 @@ import os
 load_dotenv()
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def generate_ai_summary(client_data):
+def generate_ai_summary(client_data, risk_tier):
     prompt_lines = [
         "You are a banking risk analyst. Summarize this high-risk client for an internal review memo:\n",
         f"Name: {client_data['name']}",
