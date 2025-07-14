@@ -1,32 +1,37 @@
-print("Sanity check for Git update")
-
-
+# --- Standard & External Imports ---
 import os
+from dotenv import load_dotenv  # Helps load environment variables from .env
 import streamlit as st
 
+# --- Internal Imports ---
+from utils.file_io import save_client_to_csv, read_clients_from_csv
 
-st.write("App loaded successfully ✅")
+# --- Load Environment Variables ---
+load_dotenv()  # Load .env file if it exists (for local dev)
 
+# --- Retrieve API Key ---
+# Priority: .env (local) > Streamlit Secrets (cloud)
+api_key = os.getenv("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY")
+if not api_key:
+    st.error("❌ OPENAI_API_KEY not found in environment or Streamlit secrets.")
 
-api_key = os.getenv("OPENAI_API_KEY") or st.secrets["OPENAI_API_KEY"]
+# --- Streamlit Debug Check ---
+st.write("✅ App loaded successfully")
 
-
-
+# --- Load AI Modules ---
 try:
     from clients.classify import classify_client
     from ai.openai_summary import summarize_client
     st.write("✅ Modules loaded successfully")
 except Exception as e:
-    st.error(f"❌ Import failed: {e}")
+    st.error(f"❌ Failed to import core modules: {e}")
 
-
-
+# --- Streamlit Page Settings ---
 st.set_page_config(page_title="Client Risk Review", layout="centered")
-
 st.title("🔎 Client Risk Review Tool")
-
 st.markdown("Enter client information below to classify and generate a summary.")
 
+# --- Input Form ---
 with st.form("client_form"):
     name = st.text_input("Client Name")
     industry = st.text_input("Industry")
@@ -37,9 +42,12 @@ with st.form("client_form"):
     watchlist = st.checkbox("Watchlist?", value=False)
     regulatory_issues = st.text_area("Regulatory Issues (if any)", value="")
 
+    # Submit button triggers the logic below
     submitted = st.form_submit_button("Classify & Summarize")
 
+# --- If Submitted: Classify, Summarize, Save ---
 if submitted:
+    # Collect all form inputs into one dictionary
     client_data = {
         "name": name,
         "industry": industry,
@@ -48,17 +56,30 @@ if submitted:
         "employee_count": employee_count,
         "risk_score": risk_score,
         "watchlist": watchlist,
-        "regulatory_issues": regulatory_issues
+        "regulatory_issues": regulatory_issues,
     }
 
+    # --- AI Classification ---
     with st.spinner("Classifying client..."):
         classification = classify_client(client_data)
+        save_client_to_csv(client_data, classification)  # Save to CSV log
 
+    # --- AI Summary Generation ---
     with st.spinner("Generating summary..."):
         summary = summarize_client(client_data)
 
+    # --- Display Results ---
     st.subheader("🧠 Classification")
     st.json(classification)
 
     st.subheader("📝 AI Summary")
     st.text_area("Summary Output", summary, height=300)
+
+# --- Show CSV Log of All Clients ---
+st.subheader("📊 All Clients Logged")
+all_clients = read_clients_from_csv("classified_clients.csv")
+
+if all_clients:
+    st.dataframe(all_clients)
+else:
+    st.info("No client data found yet.")
